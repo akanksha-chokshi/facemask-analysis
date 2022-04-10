@@ -24,7 +24,6 @@ import matplotlib.pyplot as plt
 
 @st.cache (persist = True)
 def read_files():
-    nltk.download('stopwords')
     nltk.download('vader_lexicon')
     products=pd.read_csv('products.csv')
     reviews=pd.read_csv('reviews.tsv',sep='\t')
@@ -103,7 +102,6 @@ def get_keywords (text):
     return str(keyword_extracted)
 
 products, reviews, merged = read_files()
-stopwords = nltk.corpus.stopwords.words('english')
 brand_products, products_grouped, brands_grouped, types_grouped, products_encoded, products_merged, cluster_ratings, types_grouped_sentiment, cluster_sentiment, product_sentiment, scored_products, merged_labels = queries (products, reviews, merged)
 st.title("Analysing the Facemasks Market")
 st.subheader("Can we use iHerb consumer reviews to better understand facemasks consumers and their needs?")
