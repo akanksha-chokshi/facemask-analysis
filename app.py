@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt
 
 @st.cache (persist = True)
 def read_files():
+    nltk.download('stopwords')
     nltk.download('vader_lexicon')
     products=pd.read_csv('products.csv')
     reviews=pd.read_csv('reviews.tsv',sep='\t')
