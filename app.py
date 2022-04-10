@@ -1,3 +1,5 @@
+import download
+
 import pandas as pd
 import numpy as np
 from sklearn import cluster
@@ -13,6 +15,8 @@ import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
+from rake_nltk import Rake
+rake_nltk_var = Rake()
 sia = SentimentIntensityAnalyzer()
 scalar = StandardScaler()
 
@@ -67,6 +71,7 @@ def queries (products, reviews, merged):
     scored_products = pd.concat([scored_products, p_grouped[['quantity', 'labels']]], axis = 1)
     scored_products ['category'] = scored_products['labels'].apply(lambda x: category_classify(x))
     merged_labels = merged.join(products_merged['labels'], on = "product_name")[['labels', 'reviews', 'sentiment']]
+    merged_labels['keywords'] = merged_labels['reviews'].apply(lambda x: get_keywords (x))
     return brand_products, products_grouped, brands_grouped, types_grouped, products_encoded, products_merged, cluster_ratings, types_grouped_sentiment, cluster_sentiment, product_sentiment, scored_products, merged_labels
     
 def sentiment_classify (num):
@@ -93,6 +98,10 @@ def category_classify (num):
         category = "Environment"
     return category
 
+def get_keywords (text):
+    rake_nltk_var.extract_keywords_from_text(text)
+    keyword_extracted = rake_nltk_var.get_ranked_phrases()
+    return str(keyword_extracted)
 
 products, reviews, merged = read_files()
 brand_products, products_grouped, brands_grouped, types_grouped, products_encoded, products_merged, cluster_ratings, types_grouped_sentiment, cluster_sentiment, product_sentiment, scored_products, merged_labels = queries (products, reviews, merged)
@@ -100,6 +109,15 @@ st.title("Analysing the Facemasks Market")
 st.subheader("Can we use iHerb consumer reviews to better understand facemasks consumers and their needs?")
 st.markdown("Use the sidebar to navigate through the analysis.")
 st.sidebar.title("Analysing the Facemasks Market")
+
+@st.cache(persist=True)
+def generate_wordcloud(merged_labels):
+    text = " ".join(s for s in merged_labels.keywords.astype(str))
+    text = text.replace("'", "")
+    stopwords = set(STOPWORDS)
+    stopwords.update(['mask', 'masks', 'face', 'wear', 'good', 'nice', 'well', 'great'])
+    wordcloud = WordCloud(stopwords = stopwords, background_color = "white", colormap='winter').generate (text)
+    return wordcloud
 
 prelim = st.sidebar.button("Initial Explorations")
 if prelim:
@@ -210,7 +228,12 @@ if reviews:
     st.subheader("What if we layer the two metrics?")
     st.write("Top 10 well-rated and well-reviewed products:")
     st.table(scored_products[['score','category', 'quantity', 'price']].head(10))
-    
+    st.header("What are the reviews about?")
+    wordcloud = generate_wordcloud(merged_labels)
+    fig, ax = plt.subplots()
+    ax.imshow(wordcloud, interpolation = "bilinear")
+    plt.axis("off")
+    st.pyplot(fig)
     
 conclusion = st.sidebar.button("Conclusion")
 if conclusion:
