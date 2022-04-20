@@ -165,7 +165,7 @@ types = st.sidebar.button("Can We Create Personas?")
 if types:
     st.subheader("Different Types of Facemasks and their Characteristics:")
     st.write(types_grouped)
-    st.write("On looking at this table, I realised that while the overall product price of all three types is quite similar (12-16 AUD, with reusable masks on the more expensive end), disposable regular masks are sold in a package of 25, while the others are sold in average packs of 2-3 for that price.")
+    st.write("On looking at this table, I realised that while the overall product price of all three types is quite similar (12-18 AUD, with reusable masks on the more expensive end), disposable regular masks are sold in a package of 25, while the others are sold in average packs of 2-3 for that price.")
     st.markdown(f'<p style="color:#6688d8;font-size:16px">{"Rating values are quite close to each other in general, but we can see that disposable N95 masks are rated more favourably, followed by disposable regulars and then reusable. Each type of mask has its own price and quantity range as well."}</p>', unsafe_allow_html=True)
     st.write("However, I could see how each type of mask attracts a different type of consumer and the cheapest price is not always best.")
     st.write("To explore different consumer personas, I decided to cluster products by their rating, quantity and price, one-hot encoded by type, to see if we could pick up on underlying motivations behind their purchases.")
